@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "amount": 100,
+    "priority": false
+  },
+  {
+    "id": 2,
+    "amount": 10,
+    "priority": true
+  },
+  {
+    "id": 3,
+    "amount": 0,
+    "priority": false
+  }
+]
