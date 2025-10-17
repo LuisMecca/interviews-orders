@@ -1,37 +1,36 @@
 # src/order_service.py
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Union
+from dataclasses import dataclass, asdict
+from typing import List, Optional, Union
 
-OrderDict = Dict[str, int]
-
+OrderDict = dict[str, int|bool]
 
 @dataclass
 class ProcessedOrder:
     id: int
     status: str
-    priority: bool
-
-
-PriorityFlag = Optional[str]
+    priority: Optional[bool] = False
 
 
 def handle_orders(
-    data: Union[List[OrderDict], PriorityFlag, None],
+    orders: List[OrderDict],
 ) -> Union[List[ProcessedOrder], str]:
-    results: List[ProcessedOrder] = []
-    for d in data:  # type: ignore[assignment]
-        if "amount" not in d or d["amount"] is None or d["amount"] <= 0:
-            results.append({"id": d.get("id"), "status": "error"})
+    if type(orders) != list:
+        return "This is not an orders list"
+    
+    processed_orders: List[ProcessedOrder] = []
+    for order in orders:  # type: ignore[assignment]
+        if order.get("amount", -1) <= 0:
+            processed_orders.append(ProcessedOrder(id=order.get("id"), status="error"))
             continue
+        processed_orders.append(ProcessedOrder(id=order["id"], status="ok", priority=order.get("priority", False)))
 
-        if d.get("priority") == True:
-            results.append({"id": d["id"], "status": "ok", "priority": True})
-        else:
-            results.append({"id": d["id"], "status": "ok", "priority": False})
-
-    results = sorted(results, key=lambda x: x.get("priority", False))
-    return results
+    processed_orders = sorted(processed_orders, key=lambda order: order.priority, reverse=True)
+    return processed_orders
 
 
 def process_data(items):
     return handle_orders(items)
+
+
+def processed_orders_format(orders: List[ProcessedOrder]) -> dict[str, str|bool]:
+    return [asdict(order) for order in orders] if type(orders) == list else "This could not be formatted"

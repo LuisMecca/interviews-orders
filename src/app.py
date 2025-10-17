@@ -1,7 +1,7 @@
 # src/app.py
 import json
 from pathlib import Path
-from .order_service import process_data
+from .order_service import process_data, processed_orders_format
 
 def main():
     sample_path = Path(__file__).resolve().parent.parent / "data" / "sample_orders.json"
@@ -13,7 +13,7 @@ def main():
                  {"id": 3, "amount": 0}]
 
     result = process_data(items)
-    print(json.dumps(result, indent=2))
+    print(json.dumps(processed_orders_format(result), indent=2))
 
 if __name__ == "__main__":
     main()
